@@ -1,0 +1,27 @@
+#lb-dates {
+  margin: 6px 0 14px;
+  padding: 10px 16px;
+  background: #1a1a2e;
+  border: 1px solid rgba(126, 232, 250, 0.25);
+  border-radius: 10px;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 13px;
+  color: #7ee8fa;
+  display: inline-block;
+}
+
+#lb-dates span {
+  font-weight: 700;
+  display: block;
+  margin-bottom: 6px;
+}
+
+#lb-dates ol {
+  margin: 0;
+  padding-left: 20px;
+  color: #ccc;
+}
+
+#lb-dates ol strong {
+  color: #7ee8fa;
+}

@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Loombard – Data zdjęcia",
+  "version": "1.0.0",
+  "description": "Pokazuje datę dodania zdjęć na stronie produktu Loombard.pl",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "host_permissions": [
+    "https://www.loombard.pl/*",
+    "https://loombard.pl/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.loombard.pl/*",
+        "https://loombard.pl/*"
+      ],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}
