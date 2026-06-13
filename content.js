@@ -1,38 +1,56 @@
-// Loombard – daty wszystkich zdjęć produktu
-
 if (location.pathname.startsWith('/products/')) {
 
   function parseDateFromUrl(url) {
-    const m = url && url.match(/\/library\/(\d{4})\/(\d{1,2})\/(\d{1,2})\//);
-    return m ? { year: +m[1], month: +m[2], day: +m[3] } : null;
+    if (!url) return null;
+    const m = url.match(/\/library\/(\d{4})\/(\d{1,2})\/(\d{1,2})\//);
+    if (!m) return null;
+    // Miesiące w JS są od 0 do 11, dlatego m[2]-1
+    return new Date(+m[1], +m[2] - 1, +m[3]);
   }
 
   function formatDate(d) {
-    const months = ['stycznia','lutego','marca','kwietnia','maja','czerwca',
-                    'lipca','sierpnia','września','października','listopada','grudnia'];
-    return `${d.day} ${months[d.month - 1]} ${d.year}`;
+    const months = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca',
+      'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
+    return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
   }
 
-  function inject() {
-    if (document.getElementById('lb-dates')) return;
+  function injectOldestDate() {
+    if (document.getElementById('lb-oldest-date')) return;
 
-    const imgs = document.querySelectorAll('#splide-product-main .splide__slide img');
+    // Pobieramy zdjęcia (pomijamy klony Splide)
+    const imgs = document.querySelectorAll('#splide-product-main .splide__slide:not(.splide__slide--clone) img');
     if (!imgs.length) return;
 
-    const rows = [];
-    imgs.forEach((img, i) => {
-      const url = img.getAttribute('data-big') || img.getAttribute('data-splide-lazy');
+    let oldestDate = null;
+
+    imgs.forEach(img => {
+      const url = img.getAttribute('data-big') || img.getAttribute('data-splide-lazy') || img.src;
       const d = parseDateFromUrl(url);
-      rows.push(`<li>Zdjęcie ${i + 1}: <strong>${d ? formatDate(d) : '?'}</strong></li>`);
+      if (d) {
+        if (!oldestDate || d < oldestDate) {
+          oldestDate = d;
+        }
+      }
     });
 
-    const panel = document.createElement('div');
-    panel.id = 'lb-dates';
-    panel.innerHTML = `<span>📅 Daty zdjęć:</span><ol>${rows.join('')}</ol>`;
+    if (oldestDate) {
+      const panel = document.createElement('div');
+      panel.id = 'lb-oldest-date';
+      panel.style = "background: #fff3cd; color: #856404; padding: 8px 12px; border-radius: 4px; margin: 10px 0; border: 1px solid #ffeeba; display: inline-block; font-weight: bold;";
+      panel.innerHTML = `📅 Przedmiot wystawiony ok. ${formatDate(oldestDate)}`;
 
-    document.querySelector('h1')?.insertAdjacentElement('afterend', panel);
+      const title = document.querySelector('h1');
+      if (title) title.insertAdjacentElement('afterend', panel);
+    }
   }
 
-  inject();
-  setTimeout(inject, 1000);
+  // Obsługa dynamicznego ładowania Vue.js
+  const observer = new MutationObserver(() => {
+    if (!document.getElementById('lb-oldest-date')) {
+      injectOldestDate();
+    }
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+  injectOldestDate();
 }
